@@ -80,10 +80,8 @@ scanFolderAndExecuteFix()
     printInfo "Scanning '$(tput smul)${1}$COLOR_RESET'"
     shopt -s globstar lastpipe
     for SUBTITLE_FILE in ${1}/**/*.srt; do
-        if [[ $(sudo rm "${SUBTITLE_FILE}") ]]; then
-            printSuccess "removing ${SUBTITLE_FILE}"
-        else
-            printError "Error removing ${SUBTITLE_FILE}"
+        if [[ -f "${SUBTITLE_FILE}" ]]; then
+            printInfo "${SUBTITLE_FILE}"
         fi
     done
 }
@@ -104,9 +102,9 @@ fixSubtitleFile()
 printAmounts()
 {
     #Calculate percentages
-    local percentageFixed=$(echo "scale=3; $SUBTITLE_AMOUNT_FIXED/$SUBTITLE_AMOUNT_TOTAL*100" | bc)
-    local percentageUntouched=$(echo "scale=3; $SUBTITLE_AMOUNT_UNTOUCHED/$SUBTITLE_AMOUNT_TOTAL*100" | bc)
-    local percentageError=$(echo "scale=3; $SUBTITLE_AMOUNT_ERROR/$SUBTITLE_AMOUNT_TOTAL*100" | bc)
+    local percentageFixed=$(echo "scale=3; $SUBTITLE_AMOUNT_FIXED/$SUBTITLE_AMOUNT_TOTAL*100" | bc &> /dev/null)
+    local percentageUntouched=$(echo "scale=3; $SUBTITLE_AMOUNT_UNTOUCHED/$SUBTITLE_AMOUNT_TOTAL*100" | bc &> /dev/null)
+    local percentageError=$(echo "scale=3; $SUBTITLE_AMOUNT_ERROR/$SUBTITLE_AMOUNT_TOTAL*100" | bc &> /dev/null)
 
     #Round off the percentages
     percentageFixed=$(printf %.$2f $percentageFixed)

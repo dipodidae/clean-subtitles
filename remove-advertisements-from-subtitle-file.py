@@ -1,14 +1,14 @@
 import re, sys
 
 try:
-    file=sys.argv[1]
+    filePath=sys.argv[1]
 except IndexError:
     print('No file')
     exit()  
 
-file = open(file, "w+")
-
+file = open(filePath, "r")
 content = file.read()
+file.close()
 
 blocks = content.split("\n\n")
 
@@ -43,7 +43,9 @@ for block in blocks:
 
 if hasAdvertisements:
     try:
+        file = open(filePath, "w")
         file.write(newContent)
+        file.close()
         print("True")
     except IndexError:
         print("Error writing to file")
