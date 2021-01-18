@@ -5,3 +5,9 @@ Open `run.sh` with a text editor and add your media paths to the `FOLDERS` array
 ```sh
 # ./run.sh
 ```
+## Single file
+You can use the included python script to clean single files
+
+```sh
+python3 remove-advertisements-from-subtitle-file.py /path/to/subtitle.srt
+```
