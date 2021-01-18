@@ -4,6 +4,7 @@ set -e
 FOLDERS=(
     "/mnt/hdd/share/tv"
     "/mnt/hdd/share/movies"
+    "/mnt/hdd/share/movies2"
 )
 
 COLOR_RESET=$(tput sgr0)
@@ -54,9 +55,10 @@ printLine()
 
 main()
 {
-    printInfo "Running fixer"
+    printInfo "Running cleaner"
 
     (
+        checkRequirements
         scanAndFixFolders
     )
 
@@ -67,21 +69,45 @@ main()
     fi
 }
 
+checkRequirements()
+{
+    local requirementsMet=1
+    local requirements=(python3)
+
+
+    for requirement in "${requirements[@]}"; do
+        if [[ ! $(which ${requirement}) ]]; then
+            printWarning "${requirement} not installed"
+            requirementsMet=0
+        fi
+    done
+
+    if [[ ! $requirementsMet == 1 ]]; then
+        printError "Not all requirements met"
+        return 20
+    fi
+
+}
+
 scanAndFixFolders()
 {
     for FOLDER in "${FOLDERS[@]}"; do
-        scanFolderAndExecuteFix $FOLDER
+        if [[ ! -d "${FOLDER}" ]]; then
+            printWarning "Folder (${FOLDER}) does not exist"
+        else
+            scanFolderAndExecuteFix $FOLDER
+        fi
     done
     printAmounts
 }
 
 scanFolderAndExecuteFix()
 {
-    printInfo "Scanning '$(tput smul)${1}$COLOR_RESET'"
     shopt -s globstar lastpipe
+    printInfo "Scanning '$(tput smul)${1}$COLOR_RESET'"
     for SUBTITLE_FILE in ${1}/**/*.srt; do
         if [[ -f "${SUBTITLE_FILE}" ]]; then
-            printInfo "${SUBTITLE_FILE}"
+            fixSubtitleFile "${SUBTITLE_FILE}"
         fi
     done
 }
@@ -90,7 +116,7 @@ fixSubtitleFile()
 {
     SUBTITLE_AMOUNT_TOTAL=$((SUBTITLE_AMOUNT_TOTAL+1))
     REMOVE=$(python3 remove-advertisements-from-subtitle-file.py "${1}")
-    if [[ $REMOVE == 'True' ]]; then
+    if [[ "${REMOVE}" == 'True' ]]; then
         SUBTITLE_AMOUNT_FIXED=$((SUBTITLE_AMOUNT_FIXED+1))
     elif [[ "${REMOVE}" == 'False' ]]; then
         SUBTITLE_AMOUNT_UNTOUCHED=$((SUBTITLE_AMOUNT_UNTOUCHED+1))

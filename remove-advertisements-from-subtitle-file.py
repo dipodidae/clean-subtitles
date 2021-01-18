@@ -35,17 +35,17 @@ hasAdvertisements = False
 
 for block in blocks:
     if not isAdvertisement(block):
-        blockCounter=blockCounter+1
         fixedBlock=re.sub('^[0-9]+', "{}".format(blockCounter), block)
+        blockCounter=blockCounter+1
         newContent=newContent+fixedBlock+"\n\n"
     else:
         hasAdvertisements = True
 
 if hasAdvertisements:
     try:
-        file = open(filePath, "w")
-        file.write(newContent)
-        file.close()
+        # file = open(filePath, "w")
+        # file.write(newContent)
+        # file.close()
         print("True")
     except IndexError:
         print("Error writing to file")
