@@ -43,9 +43,9 @@ for block in blocks:
 
 if hasAdvertisements:
     try:
-        # file = open(filePath, "w")
-        # file.write(newContent)
-        # file.close()
+        file = open(filePath, "w")
+        file.write(newContent)
+        file.close()
         print("True")
     except IndexError:
         print("Error writing to file")

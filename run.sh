@@ -28,6 +28,8 @@ SUBTITLE_AMOUNT_FIXED=0
 SUBTITLE_AMOUNT_UNTOUCHED=0
 SUBTITLE_AMOUNT_ERROR=0
 
+FLAG_VERBOSE=0
+
 printError()
 {
     printf "${MESSAGE_TEMPLATE}" "${MESSAGE_ICON_CROSS}" "${COLOR_TEXT_RED}${1}${COLOR_RESET}"
@@ -58,6 +60,7 @@ main()
     printInfo "Running cleaner"
 
     (
+        # checkFlags
         checkRequirements
         scanAndFixFolders
     )
@@ -67,6 +70,27 @@ main()
     else
         printError "Something went wrong..."
     fi
+}
+
+checkFlags()
+{  
+    printInfo "Testing flags"
+    printInfo "${1}"
+    while test $# -gt 0; do
+        printInfo "${1}"
+        case "$1" in
+            -v|--verbose)
+                shift
+                FLAG_VERBOSE=1
+                shift
+                ;;
+          
+            *)
+                printError "$1 is not a recognized flag!"
+                return 1;
+                ;;
+        esac
+    done
 }
 
 checkRequirements()
@@ -118,6 +142,10 @@ fixSubtitleFile()
     REMOVE=$(python3 remove-advertisements-from-subtitle-file.py "${1}")
     if [[ "${REMOVE}" == 'True' ]]; then
         SUBTITLE_AMOUNT_FIXED=$((SUBTITLE_AMOUNT_FIXED+1))
+        printSuccess "Fixed ${1}"
+        if [[ $FLAG_VERBOSE == 1 ]]; then
+            printSuccess "Fixed ${1}"
+        fi
     elif [[ "${REMOVE}" == 'False' ]]; then
         SUBTITLE_AMOUNT_UNTOUCHED=$((SUBTITLE_AMOUNT_UNTOUCHED+1))
     else 
